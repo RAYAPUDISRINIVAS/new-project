@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Model performance{% endblock %}
+{% block head %}{% if report %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>{% endif %}{% endblock %}
+{% block content %}
+<section class="page-header">
+  <div class="container"><div class="eyebrow">TRANSPARENT EVALUATION</div><h1>Model performance</h1><p>Metrics are generated from held-out test data and training-only cross-validation; they are not claims about individual patients.</p></div>
+</section>
+<section class="container page-content">
+  {% if report %}
+    <div class="evaluation-meta">
+      <div><span>SELECTED MODEL</span><strong>{{ report.selected_model }}</strong></div>
+      <div><span>MODEL SELECTION</span><strong>{{ report.selection_metric }}</strong></div>
+      <div><span>HOLD-OUT RECORDS</span><strong>{{ report.test_size }}</strong></div>
+      <div><span>DATASET</span><strong>{{ report.dataset }}</strong></div>
+    </div>
+    <div class="metric-grid">
+      {% for key, label in [("accuracy", "Accuracy"), ("precision", "Precision"), ("recall", "Recall"), ("f1", "F1 score"), ("roc_auc", "ROC-AUC")] %}
+        <article class="metric-card"><span>{{ label }}</span><strong>{% if report.test_metrics[key] is not none %}{{ "%.3f"|format(report.test_metrics[key]) }}{% else %}Not available{% endif %}</strong><small>Held-out test set</small></article>
+      {% endfor %}
+    </div>
+    <div class="row g-4 mt-2">
+      <div class="col-lg-7"><article class="chart-card"><h2>Cross-validation model comparison</h2><p>Mean recall across 5 folds on training data.</p><div class="chart-wrap"><canvas id="comparison-chart" aria-label="Model comparison chart"></canvas></div></article></div>
+      <div class="col-lg-5"><article class="chart-card"><h2>Held-out confusion matrix</h2><p>Rows are actual classes; columns are predicted classes.</p><div class="chart-wrap"><canvas id="confusion-chart" aria-label="Confusion matrix chart"></canvas></div><div class="confusion-labels"><span>Actual 0 → predicted 0/1</span><span>Actual 1 → predicted 0/1</span></div></article></div>
+    </div>
+    <div class="disclaimer-banner mt-4"><span class="disclaimer-symbol">i</span><div><strong>Interpret these metrics cautiously</strong><p>The Cleveland subset is small and historical. Cross-validation and one hold-out split do not establish clinical validity, fairness, calibration, or generalizability. Probabilities are not shown to users.</p></div></div>
+  {% else %}
+    <div class="empty-state"><div class="empty-icon">▥</div><h2>Evaluation report not available</h2><p>Train a model using the documented UCI Cleveland dataset to generate real cross-validation and held-out evaluation results. No example or fabricated metrics are displayed.</p><a class="btn btn-primary" href="{{ url_for('index') }}">Back to dashboard</a></div>
+  {% endif %}
+</section>
+{% endblock %}
+{% block scripts %}
+{% if report %}
+<script>
+  window.modelEvaluation = {
+    comparison: {{ report.comparison|tojson }},
+    confusion: {{ report.test_metrics.confusion_matrix|tojson }}
+  };
+</script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+{% endif %}
+{% endblock %}

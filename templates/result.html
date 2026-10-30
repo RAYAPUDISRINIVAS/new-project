@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Assessment result{% endblock %}
+{% block content %}
+<section class="page-header">
+  <div class="container"><div class="eyebrow">DEMONSTRATION OUTPUT{% if prediction_id %} · RECORD #{{ prediction_id }}{% else %} · NOT SAVED{% endif %}</div><h1>Assessment result</h1><p>The classifier's output for this submitted set of measurements.</p></div>
+</section>
+<section class="container result-content">
+  <div class="result-card {{ 'result-positive' if prediction == 1 else 'result-negative' }}">
+    <div class="result-icon" aria-hidden="true">{{ "!" if prediction == 1 else "✓" }}</div>
+    <div>
+      <div class="eyebrow">MODEL CLASSIFICATION</div>
+      <h2>{{ "Positive class" if prediction == 1 else "Negative class" }}</h2>
+      <p>{{ "The model classified this record as target > 0 in the source dataset." if prediction == 1 else "The model classified this record as target = 0 in the source dataset." }}</p>
+    </div>
+  </div>
+  <div class="disclaimer-banner result-disclaimer"><span class="disclaimer-symbol">i</span><div><strong>This is not a diagnosis or clinical risk estimate.</strong><p>This educational model was trained on a small historical dataset. Please consult a qualified healthcare professional about health concerns.</p></div></div>
+  <div class="result-actions"><a class="btn btn-primary" href="{{ url_for('predict') }}">Start another assessment</a>{% if history_enabled %}<a class="btn btn-outline-secondary" href="{{ url_for('history') }}">View saved history</a>{% endif %}<a class="text-link" href="{{ url_for('model_performance') }}">Review model evaluation →</a></div>
+</section>
+{% endblock %}

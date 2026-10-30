@@ -1,0 +1,25 @@
+{
+  "dataset": "UCI Cleveland Heart Disease (processed)",
+  "feature_columns": [
+    "age",
+    "sex",
+    "cp",
+    "trestbps",
+    "chol",
+    "fbs",
+    "restecg",
+    "thalach",
+    "exang",
+    "oldpeak",
+    "slope",
+    "ca",
+    "thal"
+  ],
+  "target_column": "target",
+  "selected_model": "Logistic Regression",
+  "training_size": 237,
+  "test_size": 60,
+  "trained_at_utc": "2026-10-28T04:09:07.050500+00:00",
+  "python_version": "3.10.11",
+  "scikit_learn_version": "1.7.2"
+}

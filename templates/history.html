@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Prediction history{% endblock %}
+{% block content %}
+<section class="page-header">
+  <div class="container"><div class="eyebrow">LOCAL DEMONSTRATION DATA</div><h1>Prediction history</h1><p>Records are stored in the local SQLite database. This demonstration does not collect names or contact details.</p></div>
+</section>
+<section class="container page-content">
+  <div class="history-toolbar">
+    <form method="get" action="{{ url_for('history') }}" class="search-form">
+      <label class="visually-hidden" for="history-search">Search history</label>
+      <input id="history-search" class="form-control" type="search" name="q" value="{{ search }}" maxlength="100" placeholder="Search result, date, or feature value">
+      <button class="btn btn-outline-secondary" type="submit">Search</button>
+      {% if search %}<a class="text-link" href="{{ url_for('history') }}">Clear search</a>{% endif %}
+    </form>
+    {% if total %}<span class="muted">{{ total }} record{{ "" if total == 1 else "s" }}</span>{% endif %}
+  </div>
+  {% if records %}
+    <div class="table-responsive history-table-wrap"><table class="table history-table">
+      <thead><tr><th scope="col">Record</th><th scope="col">Saved (UTC)</th><th scope="col">Model class</th><th scope="col">Age</th><th scope="col">Chest pain type</th><th scope="col">Other inputs</th></tr></thead>
+      <tbody>{% for record in records %}
+        <tr><td>#{{ record.id }}</td><td>{{ record.created_at }}</td><td><span class="result-badge {{ 'badge-positive' if record.prediction == 1 else 'badge-negative' }}">{{ "Positive class" if record.prediction == 1 else "Negative class" }}</span></td><td>{{ record.features.get("age", "—") }}</td><td>{{ record.features.get("cp", "—") }}</td><td>{{ record.features|length }} values stored</td></tr>
+      {% endfor %}</tbody>
+    </table></div>
+    {% if pages > 1 %}
+      <nav class="pagination-nav" aria-label="History pagination">
+        {% if page > 1 %}<a href="{{ url_for('history', page=page-1, q=search) }}" class="btn btn-outline-secondary btn-sm">← Previous</a>{% endif %}
+        <span>Page {{ page }} of {{ pages }}</span>
+        {% if page < pages %}<a href="{{ url_for('history', page=page+1, q=search) }}" class="btn btn-outline-secondary btn-sm">Next →</a>{% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <div class="empty-state"><div class="empty-icon">⌕</div><h2>{{ "No matching records" if search else "Prediction history is empty" }}</h2><p>{{ "Try another search term." if search else "Once a trained model is installed, assessment results will appear here." }}</p><a class="btn btn-primary" href="{{ url_for('predict') }}">Go to assessment</a></div>
+  {% endif %}
+  <div class="clear-history-panel">
+    <div><strong>Clear local history</strong><p>This permanently removes all saved prediction records from this app's SQLite database.</p></div>
+    <form method="post" action="{{ url_for('clear_history') }}" data-confirm="Clear all saved prediction history? This cannot be undone.">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="confirm_clear" value="yes">
+      <button class="btn btn-outline-danger" type="submit" {% if not total %}disabled{% endif %}>Clear history</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

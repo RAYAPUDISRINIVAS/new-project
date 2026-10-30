@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}New assessment{% endblock %}
+{% block content %}
+<section class="page-header">
+  <div class="container"><div class="eyebrow">SCREENING DEMONSTRATION</div><h1>Enter health measurements</h1><p>Provide the 13 fields used by the UCI Cleveland dataset. Choose dataset categories as described; all fields are required.</p></div>
+</section>
+<section class="container page-content">
+  {% if form.form_error is defined %}<div class="alert alert-danger" role="alert">{{ form.form_error }}</div>{% endif %}
+  {% if form.csrf_token is defined and form.csrf_token.errors %}<div class="alert alert-danger" role="alert">Your form session expired. Reload the page and try again.</div>{% endif %}
+  <form method="post" action="{{ url_for('predict') }}" id="prediction-form" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="form-panel">
+      <div class="form-panel-heading"><span class="panel-icon">⌖</span><div><h2>Patient measurements</h2><p>No name or contact details are collected.{% if not history_enabled %} Measurements are not saved.{% endif %}</p></div></div>
+      <div class="row g-3">
+        {% for field in [form.age, form.sex, form.cp, form.trestbps, form.chol, form.fbs, form.restecg, form.thalach, form.exang, form.oldpeak, form.slope, form.ca, form.thal] %}
+          <div class="col-md-6 col-lg-4">
+            {{ field.label(class="form-label") }}
+            {% if field.type == "SelectField" %}
+              {{ field(class="form-select" + (" is-invalid" if field.errors else "")) }}
+            {% else %}
+              {{ field(class="form-control" + (" is-invalid" if field.errors else ""), step="any" if field.name == "oldpeak" else "1", inputmode="decimal" if field.name == "oldpeak" else "numeric") }}
+            {% endif %}
+            {% if field.errors %}<div class="invalid-feedback d-block">{{ field.errors[0] }}</div>{% endif %}
+            {% if field.name == "oldpeak" %}<div class="form-hint">ST depression during exercise, in dataset units.</div>{% endif %}
+          </div>
+        {% endfor %}
+      </div>
+      <div class="form-actions"><span class="required-note">All fields are required · Accepted values are limited to the supported schema</span><button class="btn btn-primary btn-lg" type="submit" id="submit-prediction">Get demonstration result <span aria-hidden="true">→</span></button></div>
+    </div>
+  </form>
+  <div class="inline-disclaimer"><strong>Reminder:</strong> This output is for education only and is not a medical diagnosis or confirmed clinical risk.</div>
+</section>
+{% endblock %}

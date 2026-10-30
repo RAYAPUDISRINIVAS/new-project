@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f8fc">
+  <title>{% block title %}CardioLens{% endblock %} · Cardiovascular Disease Prediction</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg app-nav">
+    <div class="container">
+      <a class="navbar-brand brand" href="{{ url_for('index') }}">
+        <span class="brand-mark" aria-hidden="true">+</span>
+        <span>Cardio<span class="brand-light">Lens</span><small>EDUCATIONAL SCREENING</small></span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNavigation">
+        <div class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+          <a class="nav-link" href="{{ url_for('index') }}">Overview</a>
+          <a class="nav-link" href="{{ url_for('predict') }}">New assessment</a>
+          {% if history_enabled %}<a class="nav-link" href="{{ url_for('history') }}">History</a>{% endif %}
+          <a class="nav-link" href="{{ url_for('model_performance') }}">Model performance</a>
+          <a class="btn btn-primary nav-action" href="{{ url_for('predict') }}">Start assessment <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="container flash-container" aria-live="polite">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          <div class="alert {{ 'alert-success' if category == 'success' else 'alert-danger' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Dismiss"></button>
+          </div>
+        {% endfor %}
+      {% endwith %}
+    </div>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>CardioLens <span class="muted">· Educational demonstration</span></span>
+      <span>Not a medical device. Not for diagnosis or treatment.</span>
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
